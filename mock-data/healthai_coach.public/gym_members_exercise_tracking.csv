@@ -1,0 +1,10 @@
+id,age,gender,weight_kg,height_m,max_bpm,avg_bpm,resting_bpm,session_duration_hours,calories_burned,workout_type,fat_percentage,water_intake_liters,workout_frequency_days_week,experience_level,bmi
+1,27,Female,61.0,1.68,186,142,62,1.2,540,HIIT,23.0,2.1,4,intermediate,21.6
+2,44,Male,86.5,1.77,178,136,69,1.0,490,cycling,26.0,1.8,3,beginner,27.6
+3,35,Female,69.8,1.65,183,148,64,1.4,620,strength,28.0,2.4,4,intermediate,25.6
+4,51,Male,94.0,1.81,172,131,72,0.9,430,walking,30.0,1.6,5,beginner,28.7
+5,30,Male,75.2,1.73,189,152,60,1.5,700,crossfit,18.0,2.7,5,advanced,25.1
+6,58,Female,67.5,1.60,168,124,70,1.0,360,yoga,32.0,1.9,3,intermediate,26.4
+7,23,Female,54.2,1.62,192,156,58,1.3,610,running,21.0,2.3,5,advanced,20.7
+8,47,Male,100.4,1.79,175,133,74,0.8,390,rowing,31.0,1.7,2,beginner,31.3
+

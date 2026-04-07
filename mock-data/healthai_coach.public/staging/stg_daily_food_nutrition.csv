@@ -1,0 +1,6 @@
+food_item,category,calories_kcal,protein_g,carbohydrates_g,fat_g,fiber_g,sugars_g,sodium_mg,cholesterol_mg,meal_type,water_intake_ml
+chia_pudding,breakfast,290,9.5,34.0,12.0,10.5,11.3,90,0,breakfast,280
+tofu_stir_fry,dinner,470,24.0,42.0,20.0,8.2,9.0,520,0,dinner,400
+apple_and_almonds,snack,210,5.0,24.0,11.0,5.6,17.0,2,0,snack,180
+whole_grain_pasta,lunch,540,19.0,76.0,15.0,8.0,6.0,430,12,lunch,320
+

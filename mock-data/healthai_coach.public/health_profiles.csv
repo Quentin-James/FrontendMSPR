@@ -1,0 +1,10 @@
+id,patient_id,disease_type,severity,physical_activity_level,daily_caloric_intake,cholesterol_mg_dl,blood_pressure_mmhg,glucose_mg_dl
+1,1,none,low,moderate,2100,168,118/76,92
+2,2,hypertension,medium,low,2400,211,142/92,106
+3,3,type_2_diabetes,medium,moderate,1950,198,130/84,152
+4,4,hyperlipidemia,high,low,2600,245,148/95,114
+5,5,none,low,high,2500,172,120/78,89
+6,6,osteoarthritis,medium,low,1800,206,136/88,101
+7,7,none,low,high,2200,160,112/72,86
+8,8,metabolic_syndrome,high,low,2700,252,150/96,164
+
