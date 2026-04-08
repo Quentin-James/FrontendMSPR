@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import './App.css'
+import { NutritionPieChart } from './services/dashboardData'
 import {
   ageBandMetrics,
   computeKpis,
@@ -245,24 +246,26 @@ function App() {
           </button>
         </div>
 
-        <div className="bars">
-          {(activeMetric === 'users'
-            ? usersData
-            : activeMetric === 'nutrition'
-              ? nutritionData
+        {activeMetric === 'nutrition' ? (
+          <NutritionPieChart data={nutritionData} />
+        ) : (
+          <div className="bars">
+            {(activeMetric === 'users'
+              ? usersData
               : activeMetric === 'fitness'
                 ? fitnessData
                 : businessData
-          ).map((entry) => (
-            <div key={entry.label} className="bar-row">
-              <span>{entry.label}</span>
-              <div>
-                <div style={{ width: `${(entry.value / maxChartValue) * 100}%` }} />
+            ).map((entry) => (
+              <div key={entry.label} className="bar-row">
+                <span>{entry.label}</span>
+                <div>
+                  <div style={{ width: `${(entry.value / maxChartValue) * 100}%` }} />
+                </div>
+                <strong>{entry.value}</strong>
               </div>
-              <strong>{entry.value}</strong>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         <div className="insights-grid">
           <article>
