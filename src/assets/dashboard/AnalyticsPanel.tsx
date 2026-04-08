@@ -1,4 +1,5 @@
 import type { MetricKey, MetricPoint } from '../../types/dashboard-contracts'
+import NutritionPieChart from './NutritionPieChart'
 
 interface AnalyticsPanelProps {
   activeMetric: MetricKey
@@ -59,17 +60,21 @@ function AnalyticsPanel({
         </button>
       </div>
 
-      <div className="bars">
-        {selectedMetrics.map((entry) => (
-          <div key={entry.label} className="bar-row">
-            <span>{entry.label}</span>
-            <div>
-              <div style={{ width: `${(entry.value / maxChartValue) * 100}%` }} />
+      {activeMetric === 'nutrition' ? (
+        <NutritionPieChart data={selectedMetrics} />
+      ) : (
+        <div className="bars">
+          {selectedMetrics.map((entry) => (
+            <div key={entry.label} className="bar-row">
+              <span>{entry.label}</span>
+              <div>
+                <div style={{ width: `${(entry.value / maxChartValue) * 100}%` }} />
+              </div>
+              <strong>{entry.value}</strong>
             </div>
-            <strong>{entry.value}</strong>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       <div className="insights-grid">
         <article>
