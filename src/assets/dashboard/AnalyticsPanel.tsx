@@ -1,9 +1,9 @@
 import type { MetricKey, MetricPoint } from '../../types/dashboard-contracts'
+import MetricPieChart from './MetricPieChart'
 
 interface AnalyticsPanelProps {
   activeMetric: MetricKey
   selectedMetrics: MetricPoint[]
-  maxChartValue: number
   onMetricChange: (metric: MetricKey) => void
   ageBands: MetricPoint[]
   progression: MetricPoint[]
@@ -14,7 +14,6 @@ interface AnalyticsPanelProps {
 function AnalyticsPanel({
   activeMetric,
   selectedMetrics,
-  maxChartValue,
   onMetricChange,
   ageBands,
   progression,
@@ -34,7 +33,7 @@ function AnalyticsPanel({
           onClick={() => onMetricChange('users')}
           className={activeMetric === 'users' ? 'active' : ''}
         >
-          Utilisateurs
+          Patients
         </button>
         <button
           type="button"
@@ -50,26 +49,9 @@ function AnalyticsPanel({
         >
           Fitness
         </button>
-        <button
-          type="button"
-          onClick={() => onMetricChange('business')}
-          className={activeMetric === 'business' ? 'active' : ''}
-        >
-          Business
-        </button>
       </div>
 
-      <div className="bars">
-        {selectedMetrics.map((entry) => (
-          <div key={entry.label} className="bar-row">
-            <span>{entry.label}</span>
-            <div>
-              <div style={{ width: `${(entry.value / maxChartValue) * 100}%` }} />
-            </div>
-            <strong>{entry.value}</strong>
-          </div>
-        ))}
-      </div>
+      <MetricPieChart data={selectedMetrics} />
 
       <div className="insights-grid">
         <article>

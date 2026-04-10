@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { DashboardMockRepository } from '../../mock/dashboardMockRepository'
 import type { DashboardState, MetricKey } from '../../types/dashboard-contracts'
-import type { DashboardAnalytics, DashboardExporter, DashboardRepository, MetricPoint } from '../../types/dashboard-contracts'
+import type { DashboardAnalytics, DashboardExporter, DashboardRepository } from '../../types/dashboard-contracts'
 import type { DataAnomaly, WorkflowStatus } from '../../types/dashboard'
 import { defaultDashboardAnalytics, defaultDashboardExporter } from './dependencies'
 
@@ -57,13 +57,8 @@ export function useDashboardController(dependencies: ControllerDependencies = {}
       users: analytics.userMetrics(state.data),
       nutrition: analytics.nutritionMetrics(state.data),
       fitness: analytics.fitnessMetrics(state.data),
-      business: [
-        { label: 'Conversion premium (%)', value: kpis.premiumConversionRate },
-        { label: 'Satisfaction estimee (%)', value: kpis.estimatedSatisfaction },
-        { label: 'Score qualite (%)', value: kpis.qualityScore },
-      ] satisfies MetricPoint[],
     }),
-    [analytics, kpis, state.data],
+    [analytics, state.data],
   )
 
   const selectedMetrics = metrics[state.activeMetric]
