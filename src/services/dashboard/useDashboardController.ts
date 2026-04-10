@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { DashboardMockRepository } from '../../mock/dashboardMockRepository'
 import type { DashboardState, MetricKey } from '../../types/dashboard-contracts'
 import type { DashboardAnalytics, DashboardExporter, DashboardRepository, MetricPoint } from '../../types/dashboard-contracts'
-import type { DataAnomaly, WorkflowStatus } from '../../types/dashboard'
+import type { DataAnomaly } from '../../types/dashboard'
 import { defaultDashboardAnalytics, defaultDashboardExporter } from './dependencies'
 
 interface ControllerDependencies {
@@ -14,18 +14,11 @@ interface ControllerDependencies {
 function initialState(repository: DashboardRepository): DashboardState {
   return {
     data: repository.load(),
-    workflowStatus: 'draft',
     activeMetric: 'users',
     editingAnomalyId: null,
     draftFix: '',
     resolvedIds: [],
   }
-}
-
-function computeWorkflowProgress(status: WorkflowStatus): number {
-  if (status === 'draft') return 33
-  if (status === 'in_review') return 66
-  return 100
 }
 
 export function useDashboardController(dependencies: ControllerDependencies = {}) {
@@ -78,10 +71,6 @@ export function useDashboardController(dependencies: ControllerDependencies = {}
     }),
     [analytics, state.data],
   )
-
-  function setWorkflowStatus(workflowStatus: WorkflowStatus): void {
-    setState((current) => ({ ...current, workflowStatus }))
-  }
 
   function setActiveMetric(activeMetric: MetricKey): void {
     setState((current) => ({ ...current, activeMetric }))
@@ -136,10 +125,8 @@ export function useDashboardController(dependencies: ControllerDependencies = {}
     metrics,
     selectedMetrics,
     maxChartValue,
-    workflowProgress: computeWorkflowProgress(state.workflowStatus),
     insightMetrics,
     actions: {
-      setWorkflowStatus,
       setActiveMetric,
       setDraftFix,
       startEdit,

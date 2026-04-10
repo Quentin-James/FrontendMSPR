@@ -1,4 +1,3 @@
-export type WorkflowStatus = 'draft' | 'in_review' | 'approved'
 
 export interface Patient {
   id: number

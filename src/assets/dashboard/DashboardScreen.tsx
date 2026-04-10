@@ -3,23 +3,16 @@ import AnalyticsPanel from './AnalyticsPanel'
 import ExportPanel from './ExportPanel'
 import HeroHeader from './HeroHeader'
 import KpiGrid from './KpiGrid'
-import WorkflowPanel from './WorkflowPanel'
 import { useDashboardController } from '../../services/dashboard/useDashboardController'
 
 function DashboardScreen() {
-  const { state, kpis, topIssues, selectedMetrics, maxChartValue, workflowProgress, insightMetrics, actions } =
+  const { state, kpis, topIssues, selectedMetrics, maxChartValue,  insightMetrics, actions } =
     useDashboardController()
 
   return (
     <>
       <HeroHeader />
       <KpiGrid kpis={kpis} />
-      <WorkflowPanel
-        workflowStatus={state.workflowStatus}
-        workflowProgress={workflowProgress}
-        onWorkflowChange={actions.setWorkflowStatus}
-      />
-
       <section className="split-panel">
         <AnomaliesPanel
           topIssues={topIssues}

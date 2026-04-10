@@ -1,4 +1,4 @@
-import type { DashboardData, DataAnomaly, DashboardKpis, WorkflowStatus } from './dashboard'
+import type { DashboardData, DataAnomaly, DashboardKpis } from './dashboard'
 
 export type MetricKey = 'users' | 'nutrition' | 'fitness' | 'business'
 
@@ -32,7 +32,6 @@ export interface DashboardAnalytics {
 
 export interface DashboardState {
   data: DashboardData
-  workflowStatus: WorkflowStatus
   activeMetric: MetricKey
   editingAnomalyId: string | null
   draftFix: string

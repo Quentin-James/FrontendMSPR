@@ -23,8 +23,7 @@
 
 .api-note,
 .panel,
-.kpi-grid article,
-.workflow {
+.kpi-grid article {
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 16px;
@@ -54,13 +53,6 @@
   font-size: 13px;
 }
 
-.workflow {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: center;
-}
-
 .progress-track {
   width: 100%;
   max-width: 420px;
@@ -76,10 +68,6 @@
   transition: width 0.2s ease;
 }
 
-.workflow-actions {
-  display: flex;
-  gap: 8px;
-}
 
 button {
   border: 1px solid var(--accent-border);
@@ -237,11 +225,6 @@ td:last-child {
 
   .kpi-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .workflow {
-    flex-direction: column;
-    align-items: stretch;
   }
 
   .bar-row {
