@@ -1,12 +1,12 @@
 import type { MetricPoint } from '../../types/dashboard-contracts'
 
-interface NutritionPieChartProps {
+interface MetricPieChartProps {
   data: MetricPoint[]
 }
 
-function NutritionPieChart({ data }: NutritionPieChartProps) {
+function MetricPieChart({ data }: MetricPieChartProps) {
   const total = data.reduce((sum, d) => sum + d.value, 0)
-  if (total === 0) return <p>Aucune donnée nutrition.</p>
+  if (total === 0) return <p>Aucune donnée disponible.</p>
 
   const cx = 120
   const cy = 120
@@ -63,4 +63,4 @@ function NutritionPieChart({ data }: NutritionPieChartProps) {
   )
 }
 
-export default NutritionPieChart
+export default MetricPieChart

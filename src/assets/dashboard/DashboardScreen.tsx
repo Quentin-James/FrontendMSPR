@@ -7,7 +7,7 @@ import WorkflowPanel from './WorkflowPanel'
 import { useDashboardController } from '../../services/dashboard/useDashboardController'
 
 function DashboardScreen() {
-  const { state, kpis, topIssues, selectedMetrics, maxChartValue, workflowProgress, insightMetrics, actions } =
+  const { state, kpis, topIssues, selectedMetrics, workflowProgress, insightMetrics, actions } =
     useDashboardController()
 
   return (
@@ -41,7 +41,6 @@ function DashboardScreen() {
       <AnalyticsPanel
         activeMetric={state.activeMetric}
         selectedMetrics={selectedMetrics}
-        maxChartValue={maxChartValue}
         onMetricChange={actions.setActiveMetric}
         ageBands={insightMetrics.ageBands}
         progression={insightMetrics.progression}
