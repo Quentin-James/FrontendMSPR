@@ -17,6 +17,7 @@ function MetricPieChart({ data }: MetricPieChartProps) {
     const ratio = entry.value / total
     const startAngle = cumAngle
     const endAngle = cumAngle + ratio * 2 * Math.PI
+    // eslint-disable-next-line react-hooks/immutability
     cumAngle = endAngle
 
     const x1 = cx + r * Math.cos(startAngle)

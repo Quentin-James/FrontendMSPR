@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react'
 import { DashboardMockRepository } from '../../mock/dashboardMockRepository'
 import type { DashboardState, MetricKey } from '../../types/dashboard-contracts'
-import type { DashboardAnalytics, DashboardExporter, DashboardRepository } from '../../types/dashboard-contracts'
-import type { DataAnomaly, WorkflowStatus } from '../../types/dashboard'
+import type { DashboardAnalytics, DashboardExporter, DashboardRepository, MetricPoint } from '../../types/dashboard-contracts'
+import type { DataAnomaly } from '../../types/dashboard'
 import { defaultDashboardAnalytics, defaultDashboardExporter } from './dependencies'
 
 interface ControllerDependencies {
@@ -14,18 +14,11 @@ interface ControllerDependencies {
 function initialState(repository: DashboardRepository): DashboardState {
   return {
     data: repository.load(),
-    workflowStatus: 'draft',
     activeMetric: 'users',
     editingAnomalyId: null,
     draftFix: '',
     resolvedIds: [],
   }
-}
-
-function computeWorkflowProgress(status: WorkflowStatus): number {
-  if (status === 'draft') return 33
-  if (status === 'in_review') return 66
-  return 100
 }
 
 export function useDashboardController(dependencies: ControllerDependencies = {}) {
@@ -57,12 +50,16 @@ export function useDashboardController(dependencies: ControllerDependencies = {}
       users: analytics.userMetrics(state.data),
       nutrition: analytics.nutritionMetrics(state.data),
       fitness: analytics.fitnessMetrics(state.data),
+      business: [
+        { label: 'Conversion premium (%)', value: kpis.premiumConversionRate },
+        { label: 'Satisfaction estimee (%)', value: kpis.estimatedSatisfaction },
+        { label: 'Score qualite (%)', value: kpis.qualityScore },
+      ] satisfies MetricPoint[],
     }),
-    [analytics, state.data],
+    [analytics, kpis, state.data],
   )
 
   const selectedMetrics = metrics[state.activeMetric]
-  const maxChartValue = Math.max(...selectedMetrics.map((entry) => entry.value), 1)
 
   const insightMetrics = useMemo(
     () => ({
@@ -73,10 +70,6 @@ export function useDashboardController(dependencies: ControllerDependencies = {}
     }),
     [analytics, state.data],
   )
-
-  function setWorkflowStatus(workflowStatus: WorkflowStatus): void {
-    setState((current) => ({ ...current, workflowStatus }))
-  }
 
   function setActiveMetric(activeMetric: MetricKey): void {
     setState((current) => ({ ...current, activeMetric }))
@@ -130,11 +123,8 @@ export function useDashboardController(dependencies: ControllerDependencies = {}
     topIssues,
     metrics,
     selectedMetrics,
-    maxChartValue,
-    workflowProgress: computeWorkflowProgress(state.workflowStatus),
     insightMetrics,
     actions: {
-      setWorkflowStatus,
       setActiveMetric,
       setDraftFix,
       startEdit,

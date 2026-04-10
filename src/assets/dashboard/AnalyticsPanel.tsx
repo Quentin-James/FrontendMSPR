@@ -51,49 +51,57 @@ function AnalyticsPanel({
         </button>
       </div>
 
-      <MetricPieChart data={selectedMetrics} />
+      <MetricPieChart data={selectedMetrics} ></MetricPieChart>
 
       <div className="insights-grid">
-        <article>
-          <h3>Repartition par age</h3>
-          <ul>
-            {ageBands.map((item) => (
-              <li key={item.label}>
-                {item.label}: {item.value}
-              </li>
-            ))}
-          </ul>
-        </article>
-        <article>
-          <h3>Progression (adherence)</h3>
-          <ul>
-            {progression.map((item) => (
-              <li key={item.label}>
-                {item.label}: {item.value}
-              </li>
-            ))}
-          </ul>
-        </article>
-        <article>
-          <h3>Tendances nutritionnelles</h3>
-          <ul>
-            {nutritionDeficits.map((item) => (
-              <li key={item.label}>
-                {item.label}: {item.value}
-              </li>
-            ))}
-          </ul>
-        </article>
-        <article>
-          <h3>Niveaux d'intensite</h3>
-          <ul>
-            {intensity.map((item) => (
-              <li key={item.label}>
-                {item.label}: {item.value}
-              </li>
-            ))}
-          </ul>
-        </article>
+        {activeMetric === 'users' && (
+          <article>
+            <h3>Repartition par age</h3>
+            <ul>
+              {ageBands.map((item) => (
+                <li key={item.label}>
+                  {item.label}: {item.value}
+                </li>
+              ))}
+            </ul>
+          </article>
+        )}
+        {activeMetric === 'fitness' && (
+          <>
+            <article>
+              <h3>Progression (adherence)</h3>
+              <ul>
+                {progression.map((item) => (
+                  <li key={item.label}>
+                    {item.label}: {item.value}
+                  </li>
+                ))}
+              </ul>
+            </article>
+            <article>
+              <h3>Niveaux d'intensite</h3>
+              <ul>
+                {intensity.map((item) => (
+                  <li key={item.label}>
+                    {item.label}: {item.value}
+                  </li>
+                ))}
+              </ul>
+            </article>
+          </>
+        )}
+        {activeMetric === 'nutrition' && (
+          <article>
+            <h3>Tendances nutritionnelles</h3>
+            <ul>
+              {nutritionDeficits.map((item) => (
+                <li key={item.label}>
+                  {item.label}: {item.value}
+                </li>
+              ))}
+            </ul>
+          </article>
+        )}
       </div>
     </section>
   )
