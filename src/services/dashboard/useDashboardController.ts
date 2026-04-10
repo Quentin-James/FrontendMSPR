@@ -60,7 +60,6 @@ export function useDashboardController(dependencies: ControllerDependencies = {}
   )
 
   const selectedMetrics = metrics[state.activeMetric]
-  const maxChartValue = Math.max(...selectedMetrics.map((entry) => entry.value), 1)
 
   const insightMetrics = useMemo(
     () => ({
@@ -124,7 +123,6 @@ export function useDashboardController(dependencies: ControllerDependencies = {}
     topIssues,
     metrics,
     selectedMetrics,
-    maxChartValue,
     insightMetrics,
     actions: {
       setActiveMetric,

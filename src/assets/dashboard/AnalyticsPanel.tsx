@@ -1,9 +1,9 @@
 import type { MetricKey, MetricPoint } from '../../types/dashboard-contracts'
+import MetricPieChart from './MetricPieChart'
 
 interface AnalyticsPanelProps {
   activeMetric: MetricKey
   selectedMetrics: MetricPoint[]
-  maxChartValue: number
   onMetricChange: (metric: MetricKey) => void
   ageBands: MetricPoint[]
   progression: MetricPoint[]
@@ -14,7 +14,6 @@ interface AnalyticsPanelProps {
 function AnalyticsPanel({
   activeMetric,
   selectedMetrics,
-  maxChartValue,
   onMetricChange,
   ageBands,
   progression,
@@ -34,7 +33,7 @@ function AnalyticsPanel({
           onClick={() => onMetricChange('users')}
           className={activeMetric === 'users' ? 'active' : ''}
         >
-          Utilisateurs
+          Patients
         </button>
         <button
           type="button"
@@ -50,68 +49,59 @@ function AnalyticsPanel({
         >
           Fitness
         </button>
-        <button
-          type="button"
-          onClick={() => onMetricChange('business')}
-          className={activeMetric === 'business' ? 'active' : ''}
-        >
-          Business
-        </button>
       </div>
 
-      <div className="bars">
-        {selectedMetrics.map((entry) => (
-          <div key={entry.label} className="bar-row">
-            <span>{entry.label}</span>
-            <div>
-              <div style={{ width: `${(entry.value / maxChartValue) * 100}%` }} />
-            </div>
-            <strong>{entry.value}</strong>
-          </div>
-        ))}
-      </div>
+      <MetricPieChart data={selectedMetrics} ></MetricPieChart>
 
       <div className="insights-grid">
-        <article>
-          <h3>Repartition par age</h3>
-          <ul>
-            {ageBands.map((item) => (
-              <li key={item.label}>
-                {item.label}: {item.value}
-              </li>
-            ))}
-          </ul>
-        </article>
-        <article>
-          <h3>Progression (adherence)</h3>
-          <ul>
-            {progression.map((item) => (
-              <li key={item.label}>
-                {item.label}: {item.value}
-              </li>
-            ))}
-          </ul>
-        </article>
-        <article>
-          <h3>Tendances nutritionnelles</h3>
-          <ul>
-            {nutritionDeficits.map((item) => (
-              <li key={item.label}>
-                {item.label}: {item.value}
-              </li>
-            ))}
-          </ul>
-        </article>
-        <article>
-          <h3>Niveaux d'intensite</h3>
-          <ul>
-            {intensity.map((item) => (
-              <li key={item.label}>
-                {item.label}: {item.value}
-              </li>
-            ))}
-          </ul>
-        </article>
+        {activeMetric === 'users' && (
+          <article>
+            <h3>Repartition par age</h3>
+            <ul>
+              {ageBands.map((item) => (
+                <li key={item.label}>
+                  {item.label}: {item.value}
+                </li>
+              ))}
+            </ul>
+          </article>
+        )}
+        {activeMetric === 'fitness' && (
+          <>
+            <article>
+              <h3>Progression (adherence)</h3>
+              <ul>
+                {progression.map((item) => (
+                  <li key={item.label}>
+                    {item.label}: {item.value}
+                  </li>
+                ))}
+              </ul>
+            </article>
+            <article>
+              <h3>Niveaux d'intensite</h3>
+              <ul>
+                {intensity.map((item) => (
+                  <li key={item.label}>
+                    {item.label}: {item.value}
+                  </li>
+                ))}
+              </ul>
+            </article>
+          </>
+        )}
+        {activeMetric === 'nutrition' && (
+          <article>
+            <h3>Tendances nutritionnelles</h3>
+            <ul>
+              {nutritionDeficits.map((item) => (
+                <li key={item.label}>
+                  {item.label}: {item.value}
+                </li>
+              ))}
+            </ul>
+          </article>
+        )}
       </div>
     </section>
   )

@@ -1,6 +1,6 @@
 import type { DashboardData, DataAnomaly, DashboardKpis } from './dashboard'
 
-export type MetricKey = 'users' | 'nutrition' | 'fitness' | 'business'
+export type MetricKey = 'users' | 'nutrition' | 'fitness'
 
 export interface MetricPoint {
   label: string

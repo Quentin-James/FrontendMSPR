@@ -22,11 +22,6 @@ function KpiGrid({ kpis }: KpiGridProps) {
         <strong>{kpis.highRiskProfiles}</strong>
         <span>Profils a surveiller</span>
       </article>
-      <article>
-        <h3>Engagement</h3>
-        <strong>{kpis.premiumConversionRate}%</strong>
-        <span>Conversion premium estimee</span>
-      </article>
     </section>
   )
 }
