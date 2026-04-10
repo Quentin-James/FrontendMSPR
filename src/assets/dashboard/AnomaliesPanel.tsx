@@ -22,7 +22,7 @@ function AnomaliesPanel({
   return (
     <article className="panel">
       <div className="panel-head">
-        <h2>Nettoyage interactif des anomalies</h2>
+        <h2>Nettoyage des données</h2>
         <small>{topIssues.length} anomalies prioritaires affichees</small>
       </div>
       <table>

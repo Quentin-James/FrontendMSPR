@@ -21,7 +21,6 @@
   color: var(--text);
 }
 
-.api-note,
 .panel,
 .kpi-grid article {
   border: 1px solid var(--border);
