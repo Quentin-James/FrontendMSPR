@@ -20,13 +20,17 @@
 .hero-head p {
   color: var(--text);
 }
-
 .panel,
 .kpi-grid article {
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 16px;
   background: var(--social-bg);
+  min-width: 0; /* autorise le contenu interne a scroller sans etirer la carte */
+}
+
+.panel:hover {
+  box-shadow: var(--shadow);
 }
 
 .kpi-grid {
@@ -87,6 +91,10 @@ button:hover {
   gap: 12px;
 }
 
+.split-panel > * {
+  min-width: 0; /* evite que le tableau force la colonne a depasser */
+}
+
 .panel-head {
   display: flex;
   justify-content: space-between;
@@ -112,13 +120,41 @@ td {
 }
 
 td input {
-  width: 90px;
-  padding: 4px;
+  width: 100%;
+  min-width: 110px;
+  max-width: 240px;
+  padding: 6px;
 }
 
-td:last-child {
+.cleaning-actions-cell {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
+  min-width: 170px;
+}
+
+/* Evite de casser les autres tables: les actions sont stylées via une classe dédiée. */
+
+.pagination-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.pagination-controls label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pagination-controls select {
+  border: 1px solid var(--accent-border);
+  color: var(--text-h);
+  background: var(--accent-bg);
+  border-radius: 8px;
+  padding: 6px 8px;
 }
 
 .severity {
@@ -272,6 +308,34 @@ td:last-child {
   fill: #fff;
 }
 
+.cleaning-table-wrap {
+  width: 100%;
+  max-width: 100%;
+  display: block;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cleaning-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.cleaning-table th,
+.cleaning-table td {
+  border-bottom: 1px solid var(--border);
+  padding: 8px;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.cleaning-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
 @media (max-width: 1100px) {
   .hero-head,
   .split-panel {
@@ -289,5 +353,54 @@ td:last-child {
 
   .insights-grid {
     grid-template-columns: 1fr;
+  }
+
+  .cleaning-table {
+    min-width: 680px;
+  }
+}
+
+@media (max-width: 700px) {
+  .dashboard {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .panel {
+    padding: 12px;
+  }
+
+  .panel-head {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .panel-head h2 {
+    font-size: 30px;
+  }
+
+  .cleaning-table {
+    min-width: 620px;
+    font-size: 13px;
+  }
+
+  .cleaning-table th,
+  .cleaning-table td {
+    padding: 6px;
+  }
+
+  .cleaning-actions-cell {
+    min-width: 150px;
+    gap: 6px;
+  }
+
+  .pagination-controls {
+    gap: 6px;
+    font-size: 13px;
+  }
+
+  .pagination-controls button,
+  .pagination-controls select {
+    padding: 6px 8px;
   }
 }

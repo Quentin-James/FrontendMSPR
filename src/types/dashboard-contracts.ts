@@ -7,8 +7,16 @@ export interface MetricPoint {
   value: number
 }
 
+export type CleaningTabKey = 'nutrition'
+export type CleaningCellValue = string | number | boolean | null
+export type CleaningRow = Record<string, CleaningCellValue>
+
 export interface DashboardRepository {
-  load(): DashboardData
+  load(): Promise<DashboardData>
+  loadCleaningTab(tab: CleaningTabKey): Promise<CleaningRow[]>
+  createCleaningRow(tab: CleaningTabKey, payload: CleaningRow): Promise<CleaningRow>
+  updateCleaningRow(tab: CleaningTabKey, id: number, payload: CleaningRow): Promise<CleaningRow>
+  deleteCleaningRow(tab: CleaningTabKey, id: number): Promise<void>
 }
 
 export interface DashboardExporter {
@@ -32,9 +40,17 @@ export interface DashboardAnalytics {
 
 export interface DashboardState {
   data: DashboardData
+  status: 'loading' | 'ready' | 'error'
+  errorMessage: string | null
   activeMetric: MetricKey
-  editingAnomalyId: string | null
-  draftFix: string
-  resolvedIds: string[]
+  activeCleaningTab: CleaningTabKey
+  cleaningRows: CleaningRow[]
+  isCleaningLoading: boolean
+  cleaningError: string | null
+  editingRowId: number | null
+  rowDraft: Record<string, string>
+  newRowDraft: Record<string, string>
+  page:number;
+  pageSize:number;
 }
 
