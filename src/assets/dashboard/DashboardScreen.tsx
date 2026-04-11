@@ -6,8 +6,16 @@ import KpiGrid from './KpiGrid'
 import { useDashboardController } from '../../services/dashboard/useDashboardController'
 
 function DashboardScreen() {
-  const { state, kpis, topIssues, selectedMetrics,  insightMetrics, actions } =
+  const { state, cleaningColumns, selectedMetrics, insightMetrics, kpis, actions, paginatedRows } =
     useDashboardController()
+
+  if (state.status === 'loading') {
+    return <section className="panel">Chargement du dashboard...</section>
+  }
+
+  if (state.status === 'error') {
+    return <section className="panel">Erreur: {state.errorMessage ?? 'chargement impossible'}</section>
+  }
 
   return (
     <>
@@ -15,13 +23,28 @@ function DashboardScreen() {
       <KpiGrid kpis={kpis} />
       <section className="split-panel">
         <AnomaliesPanel
-          topIssues={topIssues}
-          editingAnomalyId={state.editingAnomalyId}
-          draftFix={state.draftFix}
-          onDraftFixChange={actions.setDraftFix}
-          onEditStart={actions.startEdit}
-          onApplyFix={actions.applyFix}
-          onResolve={actions.resolveAnomaly}
+          tabs={['nutrition']}
+          activeTab={state.activeCleaningTab}
+          columns={cleaningColumns}
+          rows={paginatedRows}
+          isLoading={state.isCleaningLoading}
+          error={state.cleaningError}
+          editingRowId={state.editingRowId}
+          rowDraft={state.rowDraft}
+          newRowDraft={state.newRowDraft}
+          onTabChange={actions.setCleaningTab}
+          onEditStart={actions.startEditRow}
+          onEditCancel={actions.cancelEditRow}
+          onRowDraftChange={actions.changeRowDraft}
+          onSaveRow={actions.saveEditingRow}
+          onDeleteRow={actions.deleteRow}
+          onNewRowFieldChange={actions.changeNewRowField}
+          onCreateRow={actions.createRow}
+          page={state.page}
+          pageSize={state.pageSize}
+          totalRows={state.cleaningRows.length}
+          onPageChange={actions.setPage}
+          onPageSizeChange={actions.setPageSize}
         />
         <ExportPanel
           data={state.data}
@@ -45,4 +68,3 @@ function DashboardScreen() {
 }
 
 export default DashboardScreen
-

@@ -6,12 +6,17 @@ import type {
   HealthProfile,
   Patient,
 } from '../types/dashboard'
-import type { DashboardRepository } from '../types/dashboard-contracts'
+import type {
+  CleaningCellValue,
+  CleaningRow,
+  CleaningTabKey,
+  DashboardRepository,
+} from '../types/dashboard-contracts'
+import { API_BASE_URL } from '../apiConfig'
 import { parseCsv, toNumber } from '../services/csv'
 
 import patientsCsv from '../../mock-data/healthai_coach.public/patients.csv?raw'
 import healthProfilesCsv from '../../mock-data/healthai_coach.public/health_profiles.csv?raw'
-import dietPreferencesCsv from '../../mock-data/healthai_coach.public/diet_preferences.csv?raw'
 import dailyFoodCsv from '../../mock-data/healthai_coach.public/daily_food_nutrition.csv?raw'
 import exerciseCsv from '../../mock-data/healthai_coach.public/gym_members_exercise_tracking.csv?raw'
 
@@ -40,16 +45,90 @@ function mapHealthProfiles(): HealthProfile[] {
   }))
 }
 
-function mapDietPreferences(): DietPreference[] {
-  return parseCsv(dietPreferencesCsv).map((row) => ({
-    id: toNumber(row.id),
-    patientId: toNumber(row.patient_id),
-    dietaryRestrictions: row.dietary_restrictions,
-    allergies: row.allergies,
-    preferredCuisine: row.preferred_cuisine,
-    weeklyExerciseFrequency: toNumber(row.weekly_exercise_frequency),
-    adherenceToDiet: row.adherence_to_diet,
-  }))
+function normalizeNutritionPayload(payload: unknown): unknown[] {
+  if (Array.isArray(payload)) return payload
+  if (typeof payload === 'object' && payload !== null) {
+    const wrapped = payload as { data?: unknown }
+    if (Array.isArray(wrapped.data)) return wrapped.data
+  }
+  return []
+}
+
+function toCellValue(value: unknown): CleaningCellValue {
+  if (
+    value === null ||
+    typeof value === 'string' ||
+    typeof value === 'number' ||
+    typeof value === 'boolean'
+  ) {
+    return value
+  }
+  return String(value ?? '')
+}
+
+function toCleaningRow(entry: unknown): CleaningRow {
+  if (typeof entry !== 'object' || entry === null) {
+    return {}
+  }
+
+  return Object.entries(entry as Record<string, unknown>).reduce<CleaningRow>((acc, [key, value]) => {
+    acc[key] = toCellValue(value)
+    return acc
+  }, {})
+}
+
+function readString(row: CleaningRow, ...keys: string[]): string {
+  for (const key of keys) {
+    const value = row[key]
+    if (typeof value === 'string' && value.trim().length > 0) {
+      return value
+    }
+  }
+  return ''
+}
+
+function readNumber(row: CleaningRow, ...keys: string[]): number {
+  for (const key of keys) {
+    const value = row[key]
+    if (typeof value === 'number') {
+      return Number.isFinite(value) ? value : 0
+    }
+    if (typeof value === 'string') {
+      const parsed = Number(value)
+      if (Number.isFinite(parsed)) {
+        return parsed
+      }
+    }
+  }
+  return 0
+}
+
+// Keep KPI computation stable by adapting nutrition DTO to DietPreference shape.
+function toDietPreference(row: CleaningRow): DietPreference {
+  return {
+    id: readNumber(row, 'id'),
+    patientId: readNumber(row, 'patientId', 'patient_id'),
+    dietaryRestrictions: readString(row, 'dietaryRestrictions', 'dietary_restrictions'),
+    allergies: readString(row, 'allergies'),
+    preferredCuisine: readString(row, 'preferredCuisine', 'preferred_cuisine', 'categoryName'),
+    weeklyExerciseFrequency: readNumber(row, 'weeklyExerciseFrequency', 'weekly_exercise_frequency'),
+    adherenceToDiet: readString(row, 'adherenceToDiet', 'adherence_to_diet').toLowerCase() || 'medium',
+  }
+}
+
+async function fetchNutritionRows(): Promise<CleaningRow[]> {
+  const response = await fetch(`${API_BASE_URL}/nutrition`)
+  if (!response.ok) {
+    throw new Error(`Erreur API nutrition: ${response.status}`)
+  }
+
+  const payload: unknown = await response.json()
+  return normalizeNutritionPayload(payload).map(toCleaningRow)
+}
+
+function endpointForTab(tab: CleaningTabKey): string {
+  if (tab === 'nutrition') return 'nutrition'
+  return 'nutrition'
 }
 
 function mapFoodNutrition(): FoodNutrition[] {
@@ -92,13 +171,69 @@ function mapExerciseTracking(): ExerciseTracking[] {
 }
 
 export class DashboardMockRepository implements DashboardRepository {
-  load(): DashboardData {
+  async load(): Promise<DashboardData> {
+    const nutritionRows = await fetchNutritionRows()
+
     return {
       patients: mapPatients(),
       healthProfiles: mapHealthProfiles(),
-      dietPreferences: mapDietPreferences(),
+      dietPreferences: nutritionRows.map(toDietPreference),
       foodNutrition: mapFoodNutrition(),
       exerciseTracking: mapExerciseTracking(),
+    }
+  }
+
+  async loadCleaningTab(tab: CleaningTabKey): Promise<CleaningRow[]> {
+    const endpoint = endpointForTab(tab)
+    const response = await fetch(`${API_BASE_URL}/${endpoint}`)
+    if (!response.ok) {
+      throw new Error(`Chargement ${tab} impossible: ${response.status}`)
+    }
+
+    const payload: unknown = await response.json()
+    return normalizeNutritionPayload(payload).map(toCleaningRow)
+  }
+
+  async createCleaningRow(tab: CleaningTabKey, payload: CleaningRow): Promise<CleaningRow> {
+    const endpoint = endpointForTab(tab)
+    const response = await fetch(`${API_BASE_URL}/${endpoint}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+
+    if (!response.ok) {
+      throw new Error(`Creation ${tab} impossible: ${response.status}`)
+    }
+
+    const created: unknown = await response.json()
+    return toCleaningRow(created)
+  }
+
+  async updateCleaningRow(tab: CleaningTabKey, id: number, payload: CleaningRow): Promise<CleaningRow> {
+    const endpoint = endpointForTab(tab)
+    const response = await fetch(`${API_BASE_URL}/${endpoint}/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+
+    if (!response.ok) {
+      throw new Error(`Mise a jour ${tab} impossible: ${response.status}`)
+    }
+
+    const updated: unknown = await response.json()
+    return toCleaningRow(updated)
+  }
+
+  async deleteCleaningRow(tab: CleaningTabKey, id: number): Promise<void> {
+    const endpoint = endpointForTab(tab)
+    const response = await fetch(`${API_BASE_URL}/${endpoint}/${id}`, {
+      method: 'DELETE',
+    })
+
+    if (!response.ok) {
+      throw new Error(`Suppression ${tab} impossible: ${response.status}`)
     }
   }
 }
