@@ -3,7 +3,7 @@ function HeroHeader() {
     <header className="hero-head">
       <div>
         <h1>Administration & Analytics</h1>
-        <p>Pilotage qualite des donnees et insights business sur les jeux de donnees mockes.</p>
+        <p>Pilotage qualite des donnees et insights business sur les donnees reelles.</p>
       </div>
     </header>
   )

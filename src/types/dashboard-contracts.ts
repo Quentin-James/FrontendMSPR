@@ -7,7 +7,13 @@ export interface MetricPoint {
   value: number
 }
 
-export type CleaningTabKey = 'nutrition'
+export interface AgePyramidBand {
+  label: string
+  male: number
+  female: number
+}
+
+export type CleaningTabKey = 'nutrition' | 'diet' | 'gym'
 export type CleaningCellValue = string | number | boolean | null
 export type CleaningRow = Record<string, CleaningCellValue>
 
@@ -29,8 +35,19 @@ export interface DashboardAnalytics {
   topAnomalies(anomalies: DataAnomaly[], count?: number): DataAnomaly[]
   computeKpis(data: DashboardData, unresolvedAnomalies: number): DashboardKpis
   userMetrics(data: DashboardData): MetricPoint[]
+  severityMetrics(data: DashboardData['healthProfiles']): MetricPoint[]
+  agePyramidMetrics(data: DashboardData['patients']): AgePyramidBand[]
+  bmiByDiseaseMetrics(
+    patients: DashboardData['patients'],
+    healthProfiles: DashboardData['healthProfiles'],
+  ): MetricPoint[]
   nutritionMetrics(data: DashboardData): MetricPoint[]
+  nutritionMealAverageMetrics(data: DashboardData): MetricPoint[]
+  topNutritionFoodsMetrics(data: DashboardData, count?: number): MetricPoint[]
   fitnessMetrics(data: DashboardData): MetricPoint[]
+  fitnessCaloriesByWorkoutMetrics(data: DashboardData['exerciseTracking']): MetricPoint[]
+  fitnessAgeHistogramMetrics(data: DashboardData['exerciseTracking']): MetricPoint[]
+  fitnessBmiByGenderMetrics(data: DashboardData['exerciseTracking']): MetricPoint[]
   ageBandMetrics(data: DashboardData['patients']): MetricPoint[]
   progressionMetrics(data: DashboardData['dietPreferences']): MetricPoint[]
   nutritionDeficitMetrics(data: DashboardData['foodNutrition']): MetricPoint[]

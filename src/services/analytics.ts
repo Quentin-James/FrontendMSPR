@@ -7,6 +7,7 @@ import type {
   FoodNutrition,
   Patient,
 } from '../types/dashboard'
+import type { AgePyramidBand } from '../types/dashboard-contracts'
 
 function average(values: number[]): number {
   if (values.length === 0) {
@@ -218,23 +219,189 @@ function countByLabel<T>(rows: T[], getLabel: (entry: T) => string): Array<{ lab
     .sort((left, right) => right.value - left.value)
 }
 
+function normalizeLabel(label: string): string {
+  return label
+    .replaceAll('_', ' ')
+    .replaceAll('-', ' ')
+    .trim()
+    .replace(/\s+/g, ' ')
+    .split(' ')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(' ')
+}
+
+function mealTypeRank(label: string): number {
+  const order = ['Breakfast', 'Lunch', 'Dinner', 'Snack']
+  const index = order.indexOf(normalizeLabel(label))
+  return index === -1 ? order.length : index
+}
+
 export function userMetrics(data: DashboardData): Array<{ label: string; value: number }> {
-  return countByLabel(data.healthProfiles, (row) => row.diseaseType)
+  return countByLabel(data.healthProfiles, (row) => normalizeLabel(row.diseaseType || 'None')).slice(0, 10)
+}
+
+export function severityMetrics(healthProfiles: DashboardData['healthProfiles']): Array<{ label: string; value: number }> {
+  return countByLabel(healthProfiles, (row) => normalizeLabel(row.severity || 'Unknown')).slice(0, 10)
+}
+
+export function agePyramidMetrics(patients: DashboardData['patients']): AgePyramidBand[] {
+  const bands: AgePyramidBand[] = [
+    { label: '0-17', male: 0, female: 0 },
+    { label: '18-30', male: 0, female: 0 },
+    { label: '31-45', male: 0, female: 0 },
+    { label: '46-60', male: 0, female: 0 },
+    { label: '61+', male: 0, female: 0 },
+  ]
+
+  const bucket = (age: number): AgePyramidBand => {
+    if (age <= 17) return bands[0]
+    if (age <= 30) return bands[1]
+    if (age <= 45) return bands[2]
+    if (age <= 60) return bands[3]
+    return bands[4]
+  }
+
+  patients.forEach((patient) => {
+    const row = bucket(patient.age)
+    const gender = normalizeLabel(patient.gender)
+    if (gender === 'Male') {
+      row.male += 1
+      return
+    }
+    row.female += 1
+  })
+
+  return bands
+}
+
+export function bmiByDiseaseMetrics(
+  patients: DashboardData['patients'],
+  healthProfiles: DashboardData['healthProfiles'],
+): Array<{ label: string; value: number }> {
+  const patientById = new Map<number, Patient>()
+  patients.forEach((patient) => {
+    patientById.set(patient.id, patient)
+  })
+
+  const grouped = new Map<string, number[]>()
+  healthProfiles.forEach((profile) => {
+    const patient = patientById.get(profile.patientId)
+    if (!patient) {
+      return
+    }
+    const disease = normalizeLabel(profile.diseaseType || 'None')
+    const values = grouped.get(disease) ?? []
+    values.push(patient.bmi)
+    grouped.set(disease, values)
+  })
+
+  return [...grouped.entries()]
+    .map(([label, values]) => ({
+      label,
+      value: round(average(values), 1),
+    }))
+    .sort((left, right) => right.value - left.value)
+    .slice(0, 10)
 }
 
 export function nutritionMetrics(data: DashboardData): Array<{ label: string; value: number }> {
-  const grouped = countByLabel(data.foodNutrition, (row) => row.mealType)
-  return grouped.map((entry) => {
-    const rows = data.foodNutrition.filter((row) => row.mealType === entry.label)
-    return {
-      label: `${entry.label} (kcal moy.)`,
-      value: round(average(rows.map((row) => row.caloriesKcal)), 0),
-    }
+  return countByLabel(data.foodNutrition, (row) => normalizeLabel(row.category)).slice(0, 10)
+}
+
+export function nutritionMealAverageMetrics(data: DashboardData): Array<{ label: string; value: number }> {
+  const grouped = new Map<string, FoodNutrition[]>()
+  data.foodNutrition.forEach((item) => {
+    const label = normalizeLabel(item.mealType)
+    const rows = grouped.get(label) ?? []
+    rows.push(item)
+    grouped.set(label, rows)
   })
+
+  return [...grouped.entries()]
+    .map(([label, rows]) => ({
+      label,
+      value: round(average(rows.map((row) => row.caloriesKcal)), 0),
+    }))
+    .sort((left, right) => mealTypeRank(left.label) - mealTypeRank(right.label) || left.label.localeCompare(right.label))
+}
+
+export function topNutritionFoodsMetrics(data: DashboardData, count = 10): Array<{ label: string; value: number }> {
+  return [...data.foodNutrition]
+    .sort((left, right) => right.caloriesKcal - left.caloriesKcal)
+    .slice(0, count)
+    .map((item) => ({
+      label: normalizeLabel(item.foodItem),
+      value: round(item.caloriesKcal, 0),
+    }))
 }
 
 export function fitnessMetrics(data: DashboardData): Array<{ label: string; value: number }> {
-  return countByLabel(data.exerciseTracking, (row) => row.workoutType)
+  return countByLabel(data.exerciseTracking, (row) => normalizeLabel(row.workoutType)).slice(0, 10)
+}
+
+export function fitnessCaloriesByWorkoutMetrics(
+  exercises: DashboardData['exerciseTracking'],
+): Array<{ label: string; value: number }> {
+  const grouped = new Map<string, number[]>()
+
+  exercises.forEach((entry) => {
+    const workout = normalizeLabel(entry.workoutType)
+    const values = grouped.get(workout) ?? []
+    values.push(entry.caloriesBurned)
+    grouped.set(workout, values)
+  })
+
+  return [...grouped.entries()]
+    .map(([label, values]) => ({
+      label,
+      value: round(average(values), 0),
+    }))
+    .sort((left, right) => right.value - left.value)
+    .slice(0, 10)
+}
+
+export function fitnessAgeHistogramMetrics(
+  exercises: DashboardData['exerciseTracking'],
+): Array<{ label: string; value: number }> {
+  const bins = [
+    { label: '0-17', min: 0, max: 17, value: 0 },
+    { label: '18-24', min: 18, max: 24, value: 0 },
+    { label: '25-34', min: 25, max: 34, value: 0 },
+    { label: '35-44', min: 35, max: 44, value: 0 },
+    { label: '45-54', min: 45, max: 54, value: 0 },
+    { label: '55-64', min: 55, max: 64, value: 0 },
+    { label: '65+', min: 65, max: Number.POSITIVE_INFINITY, value: 0 },
+  ]
+
+  exercises.forEach((entry) => {
+    const bucket = bins.find((item) => entry.age >= item.min && entry.age <= item.max)
+    if (bucket) {
+      bucket.value += 1
+    }
+  })
+
+  return bins.map(({ label, value }) => ({ label, value }))
+}
+
+export function fitnessBmiByGenderMetrics(
+  exercises: DashboardData['exerciseTracking'],
+): Array<{ label: string; value: number }> {
+  const grouped = new Map<string, number[]>()
+
+  exercises.forEach((entry) => {
+    const gender = normalizeLabel(entry.gender || 'Unknown')
+    const values = grouped.get(gender) ?? []
+    values.push(entry.bmi)
+    grouped.set(gender, values)
+  })
+
+  return [...grouped.entries()]
+    .map(([label, values]) => ({
+      label,
+      value: round(average(values), 1),
+    }))
+    .sort((left, right) => left.label.localeCompare(right.label))
+    .slice(0, 10)
 }
 
 export function normalizeSeverity(score: DataAnomaly['severity']): number {

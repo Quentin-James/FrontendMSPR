@@ -23,7 +23,7 @@ function DashboardScreen() {
       <KpiGrid kpis={kpis} />
       <section className="split-panel">
         <AnomaliesPanel
-          tabs={['nutrition']}
+          tabs={['nutrition', 'diet', 'gym']}
           activeTab={state.activeCleaningTab}
           columns={cleaningColumns}
           rows={paginatedRows}
@@ -58,10 +58,17 @@ function DashboardScreen() {
         activeMetric={state.activeMetric}
         selectedMetrics={selectedMetrics}
         onMetricChange={actions.setActiveMetric}
-        ageBands={insightMetrics.ageBands}
-        progression={insightMetrics.progression}
-        nutritionDeficits={insightMetrics.nutritionDeficits}
-        intensity={insightMetrics.intensity}
+        profileTotalPatients={insightMetrics.totalPatients}
+        profileDiseaseDistribution={insightMetrics.profileDiseaseDistribution}
+        profileSeverityDistribution={insightMetrics.profileSeverityDistribution}
+        profileAgePyramid={insightMetrics.profileAgePyramid}
+        profileBmiByDisease={insightMetrics.profileBmiByDisease}
+        nutritionCategories={insightMetrics.nutritionCategories}
+        nutritionMealAverages={insightMetrics.nutritionMealAverages}
+        topNutritionFoods={insightMetrics.topNutritionFoods}
+        fitnessCaloriesByWorkout={insightMetrics.fitnessCaloriesByWorkout}
+        fitnessAgeHistogram={insightMetrics.fitnessAgeHistogram}
+        fitnessBmiByGender={insightMetrics.fitnessBmiByGender}
       />
     </>
   )

@@ -1,7 +1,6 @@
 import type {
   DashboardData,
   DietPreference,
-  ExerciseTracking,
   FoodNutrition,
   HealthProfile,
   Patient,
@@ -17,8 +16,6 @@ import { parseCsv, toNumber } from '../services/csv'
 
 import patientsCsv from '../../mock-data/healthai_coach.public/patients.csv?raw'
 import healthProfilesCsv from '../../mock-data/healthai_coach.public/health_profiles.csv?raw'
-import dailyFoodCsv from '../../mock-data/healthai_coach.public/daily_food_nutrition.csv?raw'
-import exerciseCsv from '../../mock-data/healthai_coach.public/gym_members_exercise_tracking.csv?raw'
 
 function mapPatients(): Patient[] {
   return parseCsv(patientsCsv).map((row) => ({
@@ -45,7 +42,7 @@ function mapHealthProfiles(): HealthProfile[] {
   }))
 }
 
-function normalizeNutritionPayload(payload: unknown): unknown[] {
+function normalizeRowsPayload(payload: unknown): unknown[] {
   if (Array.isArray(payload)) return payload
   if (typeof payload === 'object' && payload !== null) {
     const wrapped = payload as { data?: unknown }
@@ -116,70 +113,126 @@ function toDietPreference(row: CleaningRow): DietPreference {
   }
 }
 
-async function fetchNutritionRows(): Promise<CleaningRow[]> {
+function mapPatientsFromDietRows(rows: CleaningRow[]): Patient[] {
+  return rows
+    .map((row) => ({
+      id: readNumber(row, 'patientId', 'patient_id', 'id'),
+      age: readNumber(row, 'age'),
+      gender: readString(row, 'gender', 'sex'),
+      weightKg: readNumber(row, 'weightKg', 'weight_kg'),
+      heightCm: readNumber(row, 'heightCm', 'height_cm'),
+      bmi: readNumber(row, 'bmi'),
+    }))
+    .filter((patient) => patient.id > 0)
+}
+
+function mapHealthProfilesFromDietRows(rows: CleaningRow[]): HealthProfile[] {
+  return rows
+    .map((row, index) => ({
+      id: readNumber(row, 'id', 'profileId', 'profile_id') || index + 1,
+      patientId: readNumber(row, 'patientId', 'patient_id', 'id'),
+      diseaseType: readString(row, 'diseaseType', 'disease_type', 'condition', 'diagnosis', 'pathology') || 'none',
+      severity: readString(row, 'severity', 'riskLevel', 'risk_level') || 'unknown',
+      physicalActivityLevel: readString(row, 'physicalActivityLevel', 'physical_activity_level') || 'unknown',
+      dailyCaloricIntake: readNumber(row, 'dailyCaloricIntake', 'daily_caloric_intake'),
+      cholesterolMgDl: readNumber(row, 'cholesterolMgDl', 'cholesterol_mg_dl'),
+      bloodPressureMmhg: readString(row, 'bloodPressureMmhg', 'blood_pressure_mmhg') || '0/0',
+      glucoseMgDl: readNumber(row, 'glucoseMgDl', 'glucose_mg_dl'),
+    }))
+    .filter((profile) => profile.patientId > 0)
+}
+
+function toFoodNutrition(entry: unknown): FoodNutrition {
+  const row = (typeof entry === 'object' && entry !== null ? (entry as Record<string, unknown>) : {})
+
+  const asNumber = (key: string, fallback = 0): number => {
+    const value = row[key]
+    if (typeof value === 'number') return Number.isFinite(value) ? value : fallback
+    if (typeof value === 'string') {
+      const parsed = Number(value)
+      return Number.isFinite(parsed) ? parsed : fallback
+    }
+    return fallback
+  }
+
+  const asString = (key: string, fallback = ''): string => {
+    const value = row[key]
+    return typeof value === 'string' ? value : fallback
+  }
+
+  return {
+    id: asNumber('id'),
+    foodItem: asString('foodItem', asString('food_item')),
+    category: asString('category', asString('categoryName')),
+    caloriesKcal: asNumber('caloriesKcal', asNumber('calories_kcal')),
+    proteinG: asNumber('proteinG', asNumber('protein_g')),
+    carbohydratesG: asNumber('carbohydratesG', asNumber('carbohydrates_g')),
+    fatG: asNumber('fatG', asNumber('fat_g')),
+    fiberG: asNumber('fiberG', asNumber('fiber_g')),
+    sugarsG: asNumber('sugarsG', asNumber('sugars_g')),
+    sodiumMg: asNumber('sodiumMg', asNumber('sodium_mg')),
+    cholesterolMg: asNumber('cholesterolMg', asNumber('cholesterol_mg')),
+    mealType: asString('mealType', asString('meal_type')),
+    waterIntakeMl: asNumber('waterIntakeMl', asNumber('water_intake_ml')),
+  }
+}
+
+async function fetchRows(endpoint: string): Promise<CleaningRow[]> {
+  const response = await fetch(`${API_BASE_URL}/${endpoint}`)
+  if (!response.ok) {
+    throw new Error(`Erreur API ${endpoint}: ${response.status}`)
+  }
+
+  const payload: unknown = await response.json()
+  return normalizeRowsPayload(payload).map(toCleaningRow)
+}
+
+function endpointForTab(tab: CleaningTabKey): string {
+  if (tab === 'nutrition') return 'nutrition'
+  if (tab === 'diet') return 'diet'
+  return 'gym'
+}
+
+async function fetchFoodNutrition(): Promise<FoodNutrition[]> {
   const response = await fetch(`${API_BASE_URL}/nutrition`)
   if (!response.ok) {
     throw new Error(`Erreur API nutrition: ${response.status}`)
   }
 
   const payload: unknown = await response.json()
-  return normalizeNutritionPayload(payload).map(toCleaningRow)
-}
-
-function endpointForTab(tab: CleaningTabKey): string {
-  if (tab === 'nutrition') return 'nutrition'
-  return 'nutrition'
-}
-
-function mapFoodNutrition(): FoodNutrition[] {
-  return parseCsv(dailyFoodCsv).map((row) => ({
-    id: toNumber(row.id),
-    foodItem: row.food_item,
-    category: row.category,
-    caloriesKcal: toNumber(row.calories_kcal),
-    proteinG: toNumber(row.protein_g),
-    carbohydratesG: toNumber(row.carbohydrates_g),
-    fatG: toNumber(row.fat_g),
-    fiberG: toNumber(row.fiber_g),
-    sugarsG: toNumber(row.sugars_g),
-    sodiumMg: toNumber(row.sodium_mg),
-    cholesterolMg: toNumber(row.cholesterol_mg),
-    mealType: row.meal_type,
-    waterIntakeMl: toNumber(row.water_intake_ml),
-  }))
-}
-
-function mapExerciseTracking(): ExerciseTracking[] {
-  return parseCsv(exerciseCsv).map((row) => ({
-    id: toNumber(row.id),
-    age: toNumber(row.age),
-    gender: row.gender,
-    weightKg: toNumber(row.weight_kg),
-    heightM: toNumber(row.height_m),
-    maxBpm: toNumber(row.max_bpm),
-    avgBpm: toNumber(row.avg_bpm),
-    restingBpm: toNumber(row.resting_bpm),
-    sessionDurationHours: toNumber(row.session_duration_hours),
-    caloriesBurned: toNumber(row.calories_burned),
-    workoutType: row.workout_type,
-    fatPercentage: toNumber(row.fat_percentage),
-    waterIntakeLiters: toNumber(row.water_intake_liters),
-    workoutFrequencyDaysWeek: toNumber(row.workout_frequency_days_week),
-    experienceLevel: row.experience_level,
-    bmi: toNumber(row.bmi),
-  }))
+  return normalizeRowsPayload(payload).map(toFoodNutrition)
 }
 
 export class DashboardMockRepository implements DashboardRepository {
   async load(): Promise<DashboardData> {
-    const nutritionRows = await fetchNutritionRows()
+    const dietRows = await fetchRows('diet')
+    const gymRows = await fetchRows('gym')
+    const patientsFromDiet = mapPatientsFromDietRows(dietRows)
+    const profilesFromDiet = mapHealthProfilesFromDietRows(dietRows)
 
     return {
-      patients: mapPatients(),
-      healthProfiles: mapHealthProfiles(),
-      dietPreferences: nutritionRows.map(toDietPreference),
-      foodNutrition: mapFoodNutrition(),
-      exerciseTracking: mapExerciseTracking(),
+      patients: patientsFromDiet.length > 0 ? patientsFromDiet : mapPatients(),
+      healthProfiles: profilesFromDiet.length > 0 ? profilesFromDiet : mapHealthProfiles(),
+      dietPreferences: dietRows.map(toDietPreference),
+      foodNutrition: await fetchFoodNutrition(),
+      exerciseTracking: gymRows.map((row) => ({
+        id: readNumber(row, 'id'),
+        age: readNumber(row, 'age'),
+        gender: readString(row, 'gender'),
+        weightKg: readNumber(row, 'weightKg', 'weight_kg'),
+        heightM: readNumber(row, 'heightM', 'height_m'),
+        maxBpm: readNumber(row, 'maxBpm', 'max_bpm'),
+        avgBpm: readNumber(row, 'avgBpm', 'avg_bpm'),
+        restingBpm: readNumber(row, 'restingBpm', 'resting_bpm'),
+        sessionDurationHours: readNumber(row, 'sessionDurationHours', 'session_duration_hours'),
+        caloriesBurned: readNumber(row, 'caloriesBurned', 'calories_burned'),
+        workoutType: readString(row, 'workoutType', 'workout_type'),
+        fatPercentage: readNumber(row, 'fatPercentage', 'fat_percentage'),
+        waterIntakeLiters: readNumber(row, 'waterIntakeLiters', 'water_intake_liters'),
+        workoutFrequencyDaysWeek: readNumber(row, 'workoutFrequencyDaysWeek', 'workout_frequency_days_week'),
+        experienceLevel: readString(row, 'experienceLevel', 'experience_level'),
+        bmi: readNumber(row, 'bmi'),
+      })),
     }
   }
 
@@ -191,7 +244,7 @@ export class DashboardMockRepository implements DashboardRepository {
     }
 
     const payload: unknown = await response.json()
-    return normalizeNutritionPayload(payload).map(toCleaningRow)
+    return normalizeRowsPayload(payload).map(toCleaningRow)
   }
 
   async createCleaningRow(tab: CleaningTabKey, payload: CleaningRow): Promise<CleaningRow> {

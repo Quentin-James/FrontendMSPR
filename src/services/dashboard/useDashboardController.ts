@@ -146,7 +146,7 @@ export function useDashboardController(dependencies: ControllerDependencies = {}
 
   const metrics = useMemo(
     () => ({
-      users: analytics.userMetrics(state.data),
+      users: analytics.userMetrics(state.data).slice(0, 10),
       nutrition: analytics.nutritionMetrics(state.data),
       fitness: analytics.fitnessMetrics(state.data),
     }),
@@ -172,9 +172,19 @@ export function useDashboardController(dependencies: ControllerDependencies = {}
 
   const insightMetrics = useMemo(
     () => ({
+      totalPatients: state.data.patients.length,
+      profileDiseaseDistribution: analytics.userMetrics(state.data).slice(0, 10),
+      profileSeverityDistribution: analytics.severityMetrics(state.data.healthProfiles).slice(0, 10),
+      profileAgePyramid: analytics.agePyramidMetrics(state.data.patients),
+      profileBmiByDisease: analytics.bmiByDiseaseMetrics(state.data.patients, state.data.healthProfiles).slice(0, 10),
       ageBands: analytics.ageBandMetrics(state.data.patients),
       progression: analytics.progressionMetrics(state.data.dietPreferences),
-      nutritionDeficits: analytics.nutritionDeficitMetrics(state.data.foodNutrition),
+      nutritionCategories: analytics.nutritionMetrics(state.data).slice(0, 10),
+      nutritionMealAverages: analytics.nutritionMealAverageMetrics(state.data).slice(0, 10),
+      topNutritionFoods: analytics.topNutritionFoodsMetrics(state.data, 10).slice(0, 10),
+      fitnessCaloriesByWorkout: analytics.fitnessCaloriesByWorkoutMetrics(state.data.exerciseTracking).slice(0, 10),
+      fitnessAgeHistogram: analytics.fitnessAgeHistogramMetrics(state.data.exerciseTracking),
+      fitnessBmiByGender: analytics.fitnessBmiByGenderMetrics(state.data.exerciseTracking).slice(0, 10),
       intensity: analytics.intensityMetrics(state.data.exerciseTracking),
     }),
     [analytics, state.data],

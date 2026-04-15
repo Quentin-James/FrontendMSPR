@@ -308,6 +308,154 @@ td input {
   fill: #fff;
 }
 
+.bar-chart {
+  display: grid;
+  gap: 12px;
+}
+
+.bar-chart-vertical {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: end;
+  min-height: 260px;
+}
+
+.bar-chart-column {
+  display: grid;
+  gap: 8px;
+  align-items: end;
+  justify-items: stretch;
+}
+
+.bar-chart-track {
+  width: 100%;
+  height: 12px;
+  background: var(--code-bg);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.bar-chart-track-vertical {
+  display: flex;
+  align-items: flex-end;
+  height: 180px;
+}
+
+.bar-chart-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #5f8cff);
+  border-radius: 999px;
+}
+
+.bar-chart-fill-vertical {
+  width: 100%;
+  background: linear-gradient(180deg, var(--accent), #5f8cff);
+}
+
+.bar-chart-label {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.bar-chart-label-centered {
+  text-align: center;
+}
+
+.bar-chart-value {
+  font-size: 13px;
+  color: var(--text-h);
+}
+
+.bar-chart-horizontal .bar-chart-row-horizontal {
+  display: grid;
+  grid-template-columns: minmax(120px, 1.6fr) 4fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.bar-chart-horizontal .bar-chart-track {
+  height: 14px;
+}
+
+.bar-chart-horizontal .bar-chart-value {
+  min-width: 80px;
+  text-align: right;
+}
+
+.analytics .insights-grid article {
+  display: grid;
+  gap: 10px;
+}
+
+.analytics .insights-grid article h3 {
+  margin-bottom: 0;
+}
+
+.profile-total {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-h);
+}
+
+.age-pyramid {
+  display: grid;
+  gap: 8px;
+}
+
+.age-pyramid-head,
+.age-pyramid-row {
+  display: grid;
+  grid-template-columns: 1fr 96px 1fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.age-pyramid-head {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.age-pyramid-head span:nth-child(2),
+.age-pyramid-label {
+  text-align: center;
+}
+
+.age-pyramid-side {
+  display: grid;
+  align-items: center;
+  gap: 6px;
+}
+
+.age-pyramid-side-left {
+  grid-template-columns: 1fr auto;
+}
+
+.age-pyramid-side-right {
+  grid-template-columns: auto 1fr;
+}
+
+.age-pyramid-bar {
+  height: 12px;
+  border-radius: 999px;
+  min-width: 2px;
+}
+
+.age-pyramid-bar-left {
+  justify-self: end;
+  background: linear-gradient(90deg, #3f8efc, #2f67b2);
+}
+
+.age-pyramid-bar-right {
+  justify-self: start;
+  background: linear-gradient(90deg, #f97373, #d64747);
+}
+
+.age-pyramid-label {
+  font-size: 13px;
+  color: var(--text-h);
+}
+
 .cleaning-table-wrap {
   width: 100%;
   max-width: 100%;
@@ -355,6 +503,15 @@ td input {
     grid-template-columns: 1fr;
   }
 
+  .bar-chart-vertical {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .age-pyramid-head,
+  .age-pyramid-row {
+    grid-template-columns: 1fr 72px 1fr;
+  }
+
   .cleaning-table {
     min-width: 680px;
   }
@@ -397,6 +554,24 @@ td input {
   .pagination-controls {
     gap: 6px;
     font-size: 13px;
+  }
+
+  .bar-chart-horizontal .bar-chart-row-horizontal {
+    grid-template-columns: 1fr;
+  }
+
+  .bar-chart-horizontal .bar-chart-value {
+    text-align: left;
+  }
+
+  .age-pyramid-head,
+  .age-pyramid-row {
+    grid-template-columns: 1fr;
+    justify-items: stretch;
+  }
+
+  .age-pyramid-label {
+    text-align: left;
   }
 
   .pagination-controls button,

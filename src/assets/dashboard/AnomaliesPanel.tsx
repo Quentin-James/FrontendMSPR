@@ -1,5 +1,11 @@
 import type { CleaningRow, CleaningTabKey } from '../../types/dashboard-contracts'
 
+const tabLabels: Record<CleaningTabKey, string> = {
+  nutrition: 'Nutrition',
+  diet: 'Régimes',
+  gym: 'Entraînements',
+}
+
 interface AnomaliesPanelProps {
   tabs: CleaningTabKey[]
   activeTab: CleaningTabKey
@@ -54,7 +60,7 @@ function AnomaliesPanel({
   return (
     <article className="panel">
       <div className="panel-head">
-        <h2>Nettoyage des données</h2>
+        <h2>Infos ressources</h2>
         <small>{rows.length} lignes</small>
       </div>
 
@@ -66,7 +72,7 @@ function AnomaliesPanel({
             className={tab === activeTab ? 'active' : ''}
             onClick={() => onTabChange(tab)}
           >
-            {tab}
+            {tabLabels[tab]}
           </button>
         ))}
       </div>
@@ -101,6 +107,7 @@ function AnomaliesPanel({
                   const rowId = Number(row.id)
                   const key = Number.isFinite(rowId) ? rowId : index
                   const isEditing = Number.isFinite(rowId) && editingRowId === rowId
+                  const canMutateRow = Number.isFinite(rowId)
 
                   return (
                     <tr key={key}>
@@ -128,14 +135,16 @@ function AnomaliesPanel({
                           </>
                         ) : (
                           <>
-                            <button type="button" onClick={() => onEditStart(row)}>
+                            <button type="button" onClick={() => onEditStart(row)} disabled={!canMutateRow}>
                               Modifier
                             </button>
-                            {Number.isFinite(rowId) ? (
-                              <button type="button" onClick={() => void onDeleteRow(rowId)}>
-                                Supprimer
-                              </button>
-                            ) : null}
+                            <button
+                              type="button"
+                              onClick={() => void onDeleteRow(rowId)}
+                              disabled={!canMutateRow}
+                            >
+                              Supprimer
+                            </button>
                           </>
                         )}
                       </td>

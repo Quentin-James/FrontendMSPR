@@ -13,11 +13,6 @@ function KpiGrid({ kpis }: KpiGridProps) {
         <span>Total profils</span>
       </article>
       <article>
-        <h3>Qualite donnees</h3>
-        <strong>{kpis.qualityScore}%</strong>
-        <span>{kpis.anomalyCount} anomalies ouvertes</span>
-      </article>
-      <article>
         <h3>Risque sante</h3>
         <strong>{kpis.highRiskProfiles}</strong>
         <span>Profils a surveiller</span>
