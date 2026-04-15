@@ -298,11 +298,11 @@ export function useDashboardController(dependencies: ControllerDependencies = {}
   }
 
   function exportAsJson(): void {
-    exporter.exportJson(state.data)
+    exporter.exportJson(state.activeCleaningTab, state.cleaningRows)
   }
 
   function exportAsCsv(): void {
-    exporter.exportCsv(state.data)
+    exporter.exportCsv(state.activeCleaningTab, state.cleaningRows)
   }
 
   return {

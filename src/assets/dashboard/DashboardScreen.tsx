@@ -47,8 +47,8 @@ function DashboardScreen() {
           onPageSizeChange={actions.setPageSize}
         />
         <ExportPanel
-          data={state.data}
-          kpis={kpis}
+          activeTab={state.activeCleaningTab}
+          totalRows={state.cleaningRows.length}
           onExportJson={actions.exportAsJson}
           onExportCsv={actions.exportAsCsv}
         />

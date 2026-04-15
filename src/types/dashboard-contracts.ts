@@ -26,8 +26,8 @@ export interface DashboardRepository {
 }
 
 export interface DashboardExporter {
-  exportJson(data: DashboardData): void
-  exportCsv(data: DashboardData): void
+  exportJson(tab: CleaningTabKey, rows: CleaningRow[]): void
+  exportCsv(tab: CleaningTabKey, rows: CleaningRow[]): void
 }
 
 export interface DashboardAnalytics {
