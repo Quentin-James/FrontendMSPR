@@ -438,7 +438,7 @@ td input {
 .age-pyramid-bar {
   height: 12px;
   border-radius: 999px;
-  min-width: 2px;
+  min-width: 0;
 }
 
 .age-pyramid-bar-left {
@@ -566,12 +566,13 @@ td input {
 
   .age-pyramid-head,
   .age-pyramid-row {
-    grid-template-columns: 1fr;
-    justify-items: stretch;
+    grid-template-columns: minmax(110px, 1fr) 64px minmax(110px, 1fr);
+    gap: 6px;
+    align-items: center;
   }
 
   .age-pyramid-label {
-    text-align: left;
+    text-align: center;
   }
 
   .pagination-controls button,

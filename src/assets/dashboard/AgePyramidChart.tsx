@@ -9,8 +9,14 @@ function AgePyramidChart({ data }: AgePyramidChartProps) {
     return <p>Aucune donnée disponible.</p>
   }
 
+  // Evite d'afficher des tranches 100% vides (0 homme, 0 femme).
+  const visibleData = data.filter((item) => item.male > 0 || item.female > 0)
+  if (visibleData.length === 0) {
+    return <p>Aucune donnée disponible.</p>
+  }
+
   const maxSide = Math.max(
-    ...data.map((item) => Math.max(item.male, item.female)),
+    ...visibleData.map((item) => Math.max(item.male, item.female)),
     0,
   )
 
@@ -21,20 +27,24 @@ function AgePyramidChart({ data }: AgePyramidChartProps) {
         <span>Tranches d'age</span>
         <span>Femmes</span>
       </div>
-      {data.map((item) => {
+      {visibleData.map((item) => {
         const left = maxSide === 0 ? 0 : (item.male / maxSide) * 100
         const right = maxSide === 0 ? 0 : (item.female / maxSide) * 100
 
         return (
           <div className="age-pyramid-row" key={item.label}>
             <div className="age-pyramid-side age-pyramid-side-left">
-              <div className="age-pyramid-bar age-pyramid-bar-left" style={{ width: `${left}%` }} />
+              {item.male > 0 ? (
+                <div className="age-pyramid-bar age-pyramid-bar-left" style={{ width: `${left}%` }} />
+              ) : null}
               <strong>{item.male}</strong>
             </div>
             <span className="age-pyramid-label">{item.label}</span>
             <div className="age-pyramid-side age-pyramid-side-right">
               <strong>{item.female}</strong>
-              <div className="age-pyramid-bar age-pyramid-bar-right" style={{ width: `${right}%` }} />
+              {item.female > 0 ? (
+                <div className="age-pyramid-bar age-pyramid-bar-right" style={{ width: `${right}%` }} />
+              ) : null}
             </div>
           </div>
         )

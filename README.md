@@ -32,8 +32,6 @@ Le front affiche un dashboard unique avec:
 
 ## D'ou viennent les donnees
 
-L'application utilise **3 sources de donnees**:
-
 ### API REST backend via `/api`
 
 Le frontend appelle aussi une API REST exposee sous le prefixe `/api`:
@@ -63,6 +61,7 @@ En developpement, Vite proxifie automatiquement `/api` vers `http://localhost:80
 - TypeScript
 - Vite
 - ESLint
+- Vitest
 
 ## Lancer le projet
 
@@ -95,20 +94,25 @@ npm run build
 npm run preview
 ```
 
+### Tests unitaires
+
+```bash
+npm run test
+```
+
 ## Scripts disponibles
 
 - `npm run dev` : demarre le serveur Vite
 - `npm run build` : compile TypeScript puis build Vite
 - `npm run lint` : lance ESLint
 - `npm run preview` : sert le build localement
+- `npm run test` : execute les tests unitaires
 
 ## Structure principale
 
 - `src/assets/dashboard/` : composants UI du dashboard
-- `src/services/` : logique analytics, csv, export, data loading
-- `src/mock/` : repository de donnees utilise par le controller
+- `src/services/` : logique analytics, export, repository API, data loading
 - `src/types/` : contrats et types du domaine
-- `mock-data/` : fichiers CSV de reference
 
 ## Notes
 

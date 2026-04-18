@@ -309,28 +309,33 @@ export function nutritionMetrics(data: DashboardData): Array<{ label: string; va
 }
 
 export function nutritionMealAverageMetrics(data: DashboardData): Array<{ label: string; value: number }> {
-  const grouped = new Map<string, FoodNutrition[]>()
+  const grouped = new Map<string, number[]>()
   data.foodNutrition.forEach((item) => {
-    const label = normalizeLabel(item.mealType)
-    const rows = grouped.get(label) ?? []
-    rows.push(item)
-    grouped.set(label, rows)
+    if (!Number.isFinite(item.caloriesKcal) || item.caloriesKcal <= 0) {
+      return
+    }
+
+    const label = normalizeLabel(item.mealType) || 'Unknown'
+    const values = grouped.get(label) ?? []
+    values.push(item.caloriesKcal)
+    grouped.set(label, values)
   })
 
   return [...grouped.entries()]
-    .map(([label, rows]) => ({
+    .map(([label, values]) => ({
       label,
-      value: round(average(rows.map((row) => row.caloriesKcal)), 0),
+      value: round(average(values), 0),
     }))
     .sort((left, right) => mealTypeRank(left.label) - mealTypeRank(right.label) || left.label.localeCompare(right.label))
 }
 
 export function topNutritionFoodsMetrics(data: DashboardData, count = 10): Array<{ label: string; value: number }> {
   return [...data.foodNutrition]
+    .filter((item) => Number.isFinite(item.caloriesKcal) && item.caloriesKcal > 0)
     .sort((left, right) => right.caloriesKcal - left.caloriesKcal)
     .slice(0, count)
     .map((item) => ({
-      label: normalizeLabel(item.foodItem),
+      label: normalizeLabel(item.foodItem) || normalizeLabel(item.category) || 'Unknown',
       value: round(item.caloriesKcal, 0),
     }))
 }

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { DashboardMockRepository } from '../../mock/dashboardMockRepository'
+import { DashboardApiRepository } from './dashboardApiRepository'
 import type {
   CleaningRow,
   CleaningTabKey,
@@ -63,7 +63,7 @@ function fromInputValue(raw: string): CleaningRow[string] {
 
 export function useDashboardController(dependencies: ControllerDependencies = {}) {
   const repository = useMemo(
-    () => dependencies.repository ?? new DashboardMockRepository(),
+    () => dependencies.repository ?? new DashboardApiRepository(),
     [dependencies.repository],
   )
   const analytics = useMemo(
