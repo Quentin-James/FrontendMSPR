@@ -6,19 +6,130 @@
   text-align: left;
 }
 
+/* HERO HEADER PREMIUM */
 .hero-head {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    padding: 26px 32px;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: linear-gradient(135deg, var(--social-bg), rgba(255,255,255,0.03));
+    box-shadow: var(--shadow);
+}
+
+/* zone texte */
+.hero-head-left {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .hero-head h1 {
-  margin: 0 0 8px;
-  font-size: 40px;
+    margin: 0;
+    font-size: 38px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text-h);
 }
 
-.hero-head p {
-  color: var(--text);
+.hero-head .subtitle {
+    margin: 0;
+    font-size: 15px;
+    color: var(--text);
+    max-width: 680px;
+    line-height: 1.5;
+}
+
+/* bloc bienvenue */
+.welcome-box {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: fit-content;
+    margin-top: 6px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: rgba(79, 116, 255, 0.12);
+    border: 1px solid rgba(79, 116, 255, 0.22);
+}
+
+.welcome-label {
+    font-size: 14px;
+    color: var(--text);
+}
+
+.welcome-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-h);
+}
+
+/* avatar clerk */
+.hero-head-right {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.welcome-text {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text);
+    text-align: center;
+}
+
+.welcome-text strong {
+    font-weight: 800;
+    color: var(--text-h);
+}
+.hero-head-right .cl-userButtonTrigger {
+    border-radius: 999px !important;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+    transition: transform 0.2s ease;
+}
+
+.hero-head-right .cl-userButtonTrigger:hover {
+    transform: scale(1.05);
+}
+
+/* responsive */
+@media (max-width: 900px) {
+    .hero-head {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 22px;
+    }
+
+    .hero-head-right {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .hero-head h1 {
+        font-size: 30px;
+    }
+}
+
+@media (max-width: 600px) {
+    .hero-head {
+        padding: 18px;
+        gap: 18px;
+    }
+
+    .hero-head h1 {
+        font-size: 24px;
+    }
+
+    .subtitle {
+        font-size: 14px;
+    }
+
+    .welcome-box {
+        flex-wrap: wrap;
+    }
 }
 .panel,
 .kpi-grid article {

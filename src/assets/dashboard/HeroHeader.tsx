@@ -1,13 +1,31 @@
+import { UserButton, useUser } from "@clerk/clerk-react";
+
 function HeroHeader() {
-  return (
-    <header className="hero-head">
-      <div>
-        <h1>Administration & Analytics</h1>
-        <p>Pilotage qualite des donnees et insights business sur les donnees reelles.</p>
-      </div>
-    </header>
-  )
+    const { user } = useUser();
+
+    console.log(user);
+
+    return (
+        <header className="hero-head">
+            <div className="hero-head-left">
+                <h1>Administration & Analytics</h1>
+
+                <p className="subtitle">
+                    Pilotage qualite des donnees et insights business sur les donnees
+                    reelles.
+                </p>
+            </div>
+
+            <div className="hero-head-right">
+                <UserButton afterSignOutUrl="/auth" />
+
+                <p className="welcome-text">
+                    Bienvenue <strong>{user?.firstName}</strong>
+                </p>
+            </div>
+        </header>
+    );
 }
 
-export default HeroHeader
+export default HeroHeader;
 
