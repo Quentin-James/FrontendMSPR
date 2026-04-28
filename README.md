@@ -1,73 +1,120 @@
-# React + TypeScript + Vite
+# Frontend MSPR - Dashboard Admin & Analytics
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Cette application est une interface web d'administration et d'analyse pour des donnees sante/nutrition/fitness.
 
-Currently, two official plugins are available:
+Elle permet a un profil metier ou data de:
+- consulter des KPI et des visualisations business,
+- inspecter les donnees par domaine (nutrition, regimes, entrainements),
+- modifier les lignes (CRUD) pour nettoyer les jeux de donnees,
+- exporter les donnees nettoyees en CSV ou JSON.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Ce que fait l'application
 
-## React Compiler
+Le front affiche un dashboard unique avec:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- un en-tete et des indicateurs KPI globaux (qualite, profils a risque, adherence, etc.),
+- un panneau de nettoyage de donnees par onglet:
+  - `nutrition`
+  - `diet`
+  - `gym`
+- des actions de gestion sur les lignes:
+  - ajouter
+  - modifier
+  - supprimer
+- une pagination des donnees affiches,
+- un export des donnees de l'onglet courant en:
+  - CSV
+  - JSON
+- un panneau Analytics avec 3 vues:
+  - profils sante
+  - nutrition
+  - fitness
 
-## Expanding the ESLint configuration
+## D'ou viennent les donnees
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### API REST backend via `/api`
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Le frontend appelle aussi une API REST exposee sous le prefixe `/api`:
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- `GET /api/diet`
+- `GET /api/nutrition`
+- `GET /api/gym`
+- plus les operations d'edition pour chaque onglet:
+  - `POST /api/{tab}`
+  - `PUT /api/{tab}/{id}`
+  - `DELETE /api/{tab}/{id}`
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+En developpement, Vite proxifie automatiquement `/api` vers `http://localhost:8084`.
+
+## Flux de donnees (resume)
+
+1. Le frontend charge les datasets via le repository du dashboard.
+2. Les donnees sont normalisees (noms de champs, types, formats).
+3. Les metriques et anomalies sont calculees cote frontend.
+4. L'utilisateur peut corriger les donnees depuis l'interface.
+5. Les modifications sont envoyees au backend via l'API REST.
+6. Le resultat peut etre exporte en CSV ou JSON.
+
+## Stack technique
+
+- React 19
+- TypeScript
+- Vite
+- ESLint
+- Vitest
+
+## Lancer le projet
+
+### Prerequis
+
+- Node.js 20+ recommande
+- npm
+
+### Installation
+
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Developpement
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev
 ```
+
+### Build production
+
+```bash
+npm run build
+```
+
+### Preview locale du build
+
+```bash
+npm run preview
+```
+
+### Tests unitaires
+
+```bash
+npm run test
+```
+
+## Scripts disponibles
+
+- `npm run dev` : demarre le serveur Vite
+- `npm run build` : compile TypeScript puis build Vite
+- `npm run lint` : lance ESLint
+- `npm run preview` : sert le build localement
+- `npm run test` : execute les tests unitaires
+
+## Structure principale
+
+- `src/assets/dashboard/` : composants UI du dashboard
+- `src/services/` : logique analytics, export, repository API, data loading
+- `src/types/` : contrats et types du domaine
+
+## Notes
+
+- Le projet est un frontend; il attend une API backend disponible pour les endpoints `/api/*`.
+- Sans backend actif, les appels API echoueront sur les jeux dependants de `/api`.

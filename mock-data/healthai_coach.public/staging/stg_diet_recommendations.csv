@@ -1,0 +1,10 @@
+patient_id,age,gender,weight_kg,height_cm,bmi,disease_type,severity,physical_activity_level,daily_caloric_intake,cholesterol_mg_dl,blood_pressure_mmhg,glucose_mg_dl,dietary_restrictions,allergies,preferred_cuisine,weekly_exercise_hours,adherence_to_diet_plan,dietary_nutrient_imbalance_score,diet_recommendation
+1,29,Female,62.4,168,22.1,none,low,moderate,2100,168,118/76,92,none,none,mediterranean,4,high,0.18,maintain_balanced_meals_with_high_fiber_breakfasts
+2,45,Male,84.2,176,27.2,hypertension,medium,low,2400,211,142/92,106,low_sodium,shellfish,traditional_french,2,medium,0.62,reduce_sodium_to_under_1500mg_and_add_daily_walks
+3,37,Female,71.0,165,26.1,type_2_diabetes,medium,moderate,1950,198,130/84,152,low_sugar,peanuts,asian,3,medium,0.71,prioritize_low_glycemic_carbs_and_evenly_spaced_meals
+4,53,Male,92.8,180,28.6,hyperlipidemia,high,low,2600,245,148/95,114,low_fat,none,mediterranean,1,low,0.83,replace_saturated_fats_with_olive_oil_and_legumes
+5,31,Male,74.5,172,25.2,none,low,high,2500,172,120/78,89,high_protein,lactose,mexican,5,high,0.24,maintain_protein_distribution_across_4_meals
+6,60,Female,68.0,160,26.6,osteoarthritis,medium,low,1800,206,136/88,101,low_inflammation,gluten,japanese,2,medium,0.58,include_omega3_sources_and_limit_processed_foods
+7,24,Female,55.3,162,21.1,none,low,high,2200,160,112/72,86,vegetarian,none,indian,4,high,0.16,maintain_plant_protein_variety_and_hydration
+8,48,Male,101.2,178,31.9,metabolic_syndrome,high,low,2700,252,150/96,164,low_carb,none,mediterranean,1,low,0.91,enforce_calorie_deficit_with_low_carb_high_fiber_plan
+
